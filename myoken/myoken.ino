@@ -33,6 +33,7 @@
 
 // Pins
 const int vib_pin = 9;
+const int vib_pwr = 200;
 const int led_pin = LED_BUILTIN;
 
 // Settings
@@ -44,21 +45,21 @@ const unsigned long buzz_dur = 500; // Time (ms) that buzzer is on
 
 // Hard-iron calibration settings
 const float hard_iron[3] = {
-     6.43,  -25.08,  7.73
+     7.77,  -19.50,  9.17
 };
 
 // Soft-iron calibration settings
 const float soft_iron[3][3] = {
-  {  0.991, -0.016, -0.007  },
-  { -0.016,  1.021, -0.020  },
-  { -0.007, -0.020,  0.989  }
+  {  1.013, -0.009, -0.009  },
+  { -0.009,  0.983,  0.012  },
+  { -0.009, -0.012,  1.004  }
 };
 
 // Magnetic declination from magnetic-declination.com
 // East is positive (+), west is negative (-)
 // mag_decl = (+/-)(deg + min/60 + sec/3600)
 // Set to 0 to get magnetic heading instead of geo heading
-const float mag_decl = 7.92;
+const float mag_decl = -1.183;
 
 // Sensor settings
 #define MLX_GAIN          MLX90393_GAIN_1X
@@ -89,7 +90,7 @@ void setup() {
     Serial.println("ERROR: Could not connect to magnetometer");
 #endif
     while (1) {
-      led_vib(HIGH, 100);
+      led_vib(HIGH, vib_pwr);
       delay(1000);
       led_vib(LOW, 0);
       delay(1000);
@@ -165,7 +166,6 @@ void loop() {
       if ((heading <= target_dir - hyst_tol) || 
           (heading >= target_dir + hyst_tol)) {
         facing_north = false;
-        Serial.println("Re-armed");
       }
     }
 
@@ -185,7 +185,8 @@ void loop() {
 #if DEBUG
   delay(sleep_ms);
 #else
-  LowPower.sleep(sleep_ms);
+  delay(sleep_ms);
+  //LowPower.sleep(sleep_ms); // Does not seem to be working
 #endif
 }
 
